@@ -1,82 +1,88 @@
-// Your code here
-let createEmployeeRecord = function(row){
+//making an object to hold our informations
+const requiredInfo = {
+    firstName: '',
+    familyName: '',
+    title: '',
+    payPerHour: '',
+    timeInEvents: '',
+    timeOutEvents: '',
+};
+
+//our array that holds our information
+let infoArray = ["Ryan", "Nyongesa", "junior dev", "ksh1915"];
+
+//our function for creating employee records
+function createEmployeeRecord(infoArray){
     return {
-        firstName: row[0],
-        familyName: row[1],
-        title: row[2],
-        payPerHour: row[3],
+        firstName: infoArray[0],
+        familyName: infoArray[1],
+        title: infoArray[2],
+        payPerHour: infoArray[3],
         timeInEvents: [],
         timeOutEvents: []
     }
-}
+};
 
-let createEmployeeRecords = function(employeeRowData) {
-    return employeeRowData.map(function(row){
-        return createEmployeeRecord(row)
+//employee records
+function createEmployeeRecords(infoData){
+    return infoData.map((infoArray) => {
+        return createEmployeeRecord(infoArray)
     })
-}
+};
 
-let createTimeInEvent = function(employee, dateStamp){
-    let [date, hour] = dateStamp.split(' ')
+//create out time in events
+function createTimeInEvent(requiredInfo, datestamp){
+    let [date,hour] = datestamp.split('');
 
-    employee.timeInEvents.push({
-        type: "TimeIn",
-        hour: parseInt(hour, 10),
-        date,
+    requiredInfo.timeInEvents.push({
+        type:"TimeIn",
+        hour: parseInt(hour, 10), date,
     })
+    return requiredInfo
+};
 
-    return employee
-}
+//create time out event
+function createTimeOutEvent(requiredInfo, datestamp){
+    let [date,hour] = datestamp.split('');
 
-let createTimeOutEvent = function(employee, dateStamp){
-    let [date, hour] = dateStamp.split(' ')
+    requiredInfo.timeOutEvents.push({
+        type:"TimeOut",
+        hour: parseInt(hour, 10), date,
+    });
+    return requiredInfo
+};
 
-    employee.timeOutEvents.push({
-        type: "TimeOut",
-        hour: parseInt(hour, 10),
-        date,
-    })
+function hoursWorkedOnDate(requiredInfo, soughtDate){
+    let inEvents = requiredInfo.timeInEvents.find((e) => {
+        return e.date === soughtDate;
+    });
 
-    return employee
-}
+    let outEvents = requiredInfo.timeOutEvents.find((e) => {
+        return e.date === soughtDate;
+    });
 
-let hoursWorkedOnDate = function(employee, soughtDate){
-    let inEvent = employee.timeInEvents.find(function(e){
-        return e.date === soughtDate
-    })
+    return (outEvents.hour - inEvents.hour) / 100
+};
 
-    let outEvent = employee.timeOutEvents.find(function(e){
-        return e.date === soughtDate
-    })
+function wagesEarnedOnDate(requiredInfo, soughtDate){
+    let wages = hoursWorkedOnDate(requiredInfo, soughtDate) * requiredInfo.payPerHour
+    return parseFloat(wages.toString())
+};
 
-    return (outEvent.hour - inEvent.hour) / 100
-}
-
-let wagesEarnedOnDate = function(employee, dateSought){
-    let rawWage = hoursWorkedOnDate(employee, dateSought)
-        * employee.payPerHour
-    return parseFloat(rawWage.toString())
-}
-
-let allWagesFor = function(employee){
-    let eligibleDates = employee.timeInEvents.map(function(e){
-        return e.date
+function allWagesFor(requiredInfo){
+    let eligibleDates = requiredInfo.timeInEvents.map(e => {
+        return e.date;
     })
 
-    let payable = eligibleDates.reduce(function(memo, d){
-        return memo + wagesEarnedOnDate(employee, d)
+    let payable = eligibleDates.reduce((memo,d) => {
+        return memo + wagesEarnedOnDate(createEmployeeRecord, d)
     }, 0)
-
     return payable
-}
+};
 
-let findEmployeeByFirstName = function(srcArray, firstName) {
-  return srcArray.find(function(rec){
-    return rec.firstName === firstName
-  })
-}
-
-let calculatePayroll = function(arrayOfEmployeeRecords){
-    return arrayOfEmployeeRecords.reduce(function(memo, rec){
+function calculatePayroll(array){
+    return arrayOfEmployeeRecords.reduce((memo, rec) => {
         return memo + allWagesFor(rec)
-    }, 0)}
+    }, 0)
+};
+
